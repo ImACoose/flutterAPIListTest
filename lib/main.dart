@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:list_app/models/post_model.dart';
 import 'package:list_app/repository/post_repository.dart';
 
 void main() {
@@ -44,9 +42,16 @@ class InformationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MainApp()));
+            },
+          ),
+        ),
         body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Center(
               child: FutureBuilder(
                   future: PostRepository.getPosts(),
@@ -58,20 +63,30 @@ class InformationPage extends StatelessWidget {
                       return ListView.builder(
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) => Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: ElevatedButton(
-                            onPressed: () {},
-                            child: Column(children: [
-                              Text(snapshot.data![index].id.toString()),
-                              Text(snapshot.data![index].title.toString()),
-                              Text(snapshot.data![index].body.toString()),
-                            ]),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: ((context) => DetailsPage(
+                                          postId: snapshot.data![index].id))));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(children: [
+                                Text(
+                                  snapshot.data![index].title.toString(),
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                              ]),
+                            ),
                           ),
                         ),
                       );
                       // we have the data, do stuff here
                     } else {
-                      return Text('no data');
+                      return const Text('no data');
                       // we did not recieve any data, maybe show error or no data available
                     }
                   })),
@@ -81,8 +96,43 @@ class InformationPage extends StatelessWidget {
   }
 }
 
-PostModel test = PostModel(
-    userId: 1,
-    id: 1,
-    title: 'bryce is short',
-    body: 'did i ever tell you about the time bryce was really short');
+class DetailsPage extends StatelessWidget {
+  int postId;
+
+  DetailsPage({super.key, required this.postId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const InformationPage())),
+        ),
+      ),
+      body: FutureBuilder(
+          future: PostRepository.getPost(postId),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasData) {
+              return Card(
+                child: Column(
+                  children: [
+                    Text(
+                      snapshot.data!.title.toString(),
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    Text(
+                      snapshot.data!.body.toString(),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const Text('no data');
+            }
+          }),
+    );
+  }
+}

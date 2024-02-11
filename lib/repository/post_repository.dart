@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:list_app/models/post_model.dart';
 
@@ -12,5 +11,16 @@ class PostRepository {
     final body = response.data;
     print(body);
     return body.map<PostModel>((e) => PostModel.fromJson(e)).toList();
+  }
+
+  static Future<PostModel> getPost(int postId) async {
+    final dio = Dio(BaseOptions(
+      baseUrl: 'https://jsonplaceholder.typicode.com/posts',
+    ));
+
+    final response = await dio.get('/$postId');
+    final body = response.data;
+    print(body);
+    return PostModel.fromJson(body);
   }
 }
