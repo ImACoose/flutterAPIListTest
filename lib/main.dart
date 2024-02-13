@@ -5,30 +5,65 @@ void main() {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  int _selectedIndex = 0;
+
+  void _onTapped(index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+            BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Create'),
+            BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Inbox'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile')
+          ],
+          currentIndex: _selectedIndex,
+          onTap: _onTapped,
+        ),
         body: Center(
-          child: ListView.builder(
-              itemCount: 3,
-              itemBuilder: ((context, index) => ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const InformationPage()),
-                      );
-                    },
-                    child: Text(
-                      "hi",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ))),
+          child: Column(
+            children: [
+              ElevatedButton(
+                  onPressed: () {}, child: const Text('get notification')),
+              SizedBox(
+                height: 200,
+                child: ListView.builder(
+                    itemCount: 3,
+                    itemBuilder: ((context, index) => ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const InformationPage()),
+                            );
+                          },
+                          child: Text(
+                            "hi",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ))),
+              ),
+            ],
+          ),
         ),
       ),
     );
